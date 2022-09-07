@@ -1,22 +1,12 @@
-import { ExtraOptions, RouterModule } from '@angular/router';
-
 import { AppComponent } from './app.component';
+import { AppRoutingModule } from './app.routing';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { appRoutes } from './app.routing';
-
-const routerConfig: ExtraOptions = {
-  initialNavigation: 'enabledBlocking'
-}
 
 @NgModule({
   declarations: [AppComponent],
-  imports: [
-    BrowserModule,
-    RouterModule.forRoot(appRoutes, routerConfig),
-  ],
+  imports: [BrowserModule, AppRoutingModule],
   providers: [],
   bootstrap: [AppComponent],
 })
-
 export class AppModule {}
