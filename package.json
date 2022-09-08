@@ -51,14 +51,10 @@
     "@nrwl/node": "14.6.5",
     "@nrwl/nx-cloud": "latest",
     "@nrwl/workspace": "14.6.5",
-<<<<<<< HEAD
-    "@semantic-release/npm": "^9.0.1",
-=======
     "@semantic-release/changelog": "^6.0.1",
     "@semantic-release/commit-analyzer": "^9.0.2",
     "@semantic-release/git": "^10.0.1",
     "@semantic-release/release-notes-generator": "^10.0.3",
->>>>>>> 97df40c55d345debec2d78e28dde257dc3312fe8
     "@types/jest": "28.1.1",
     "@types/node": "16.11.7",
     "@typescript-eslint/eslint-plugin": "~5.33.1",
