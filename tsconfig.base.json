@@ -14,7 +14,9 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@music/frontend/components": ["apps/frontend/src/app/components"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }

@@ -1,0 +1,46 @@
+:host {
+  --box-shadow: 0 2px 5px 1px rgb(64 60 67 / 16%);
+  --width: 100px;
+
+  .container-search {
+    width: 100%;
+
+    .container-bar-search {
+      width: calc(100% - var(--width));
+      mat-label {
+        color: var(--color-search-bar);
+      }
+
+      ::ng-deep {
+        .mat-form-field-flex {
+          border-radius: var(--width-sr) 0 0 var(--width-sr);
+          padding-left: var(--width-sr);
+          padding-right: var(--width-sr);
+          background-color: var(--background-color-search-bar);
+          box-shadow: var(--box-shadow);
+        }
+
+        .mat-form-field-ripple {
+          width: calc(100% - 2 * var(--width-sr));
+          margin-left: var(--width-sr);
+        }
+      }
+    }
+  }
+
+  .container-action-search {
+    position: absolute;
+    display: inline-block;
+    box-shadow: var(--box-shadow);
+    border-radius: 0 var(--width-sr) var(--width-sr) 0;
+
+    button {
+      border-radius: 0 var(--width-sr) var(--width-sr) 0;
+      width: var(--width);
+      background-color: var(--background-color-search-button);
+      color: var(--color-search-bar);
+      border-left: 1px solid var(--color-search-bar);
+    }
+  }
+
+}

@@ -1,1 +1,21 @@
 /* You can add global styles to this file, and also import other style files */
+
+:root {
+  /* size */
+  --width-sr: 22px;
+  --padding-sr-rs: 10px;
+
+  /* color */
+  --color-search-bar: white;
+  --background-color-search-bar: red;
+  --background-color-search-button: red;
+}
+
+body {
+  .search-autocomplete {
+    width: calc(100% - 2 * var(--width-sr) - var(--padding-sr-rs));
+    left: var(--width-sr);
+    margin-top: 2px;
+    padding: var(--padding-sr-rs);
+  }
+}
