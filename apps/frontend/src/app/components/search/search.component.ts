@@ -15,6 +15,7 @@ import { Observable } from 'rxjs';
 export class SearchComponent implements OnInit{
   @ViewChild('preferenceInput') preferenceInput: ElementRef<HTMLInputElement> | undefined;
   @Input() allPreferences: Preference[] | undefined;
+  @Input() resultsPreferenceInit: string | null | undefined;
   @Output() resultsPreference = new EventEmitter<Preference[]>();
 
   separatorKeysCodes: number[];
@@ -34,6 +35,35 @@ export class SearchComponent implements OnInit{
   }
 
   ngOnInit(): void {
+    if(this.resultsPreferenceInit) {
+      const preferences = this.resultsPreferenceInit.split('&');
+      this.preferencesUser = preferences.reduce<any>((preview, values) => {
+        const [category, stringList] = values.split(":");
+        const list = stringList.split(',').map(Number);
+
+        const children = this.allPreferences?.map((preference) => {
+
+          if(category === preference.category) {
+            const children = preference.children.filter((value) => {
+              const includeIndex = list.includes(value?.id);
+              if(includeIndex) {
+                this.tags.push(value.name);
+              }
+              return includeIndex;
+            });
+            return children.filter(Boolean);
+          }
+
+          return;
+        }).filter(Boolean)[0];
+
+        if(children) {
+          preview[category] = { category, children };
+        }
+        return preview;
+      }, {});
+    }
+
     setTimeout(() => {
       this.afterViewInit = true;
     });
@@ -114,7 +144,7 @@ export class SearchComponent implements OnInit{
           return list;
         }
         return;
-      }).filter((e) => Boolean(e)) as unknown as PreferenceDescription[];
+      }).filter(Boolean) as unknown as PreferenceDescription[];
 
       if(lists) {
         preview.push({ category, children: lists });

@@ -9,7 +9,7 @@ import { Preference } from '@music/core/type';
 export class HomeService {
     private _allPreferences: BehaviorSubject<Preference[]> = new BehaviorSubject<Preference[]>([]);
     private _resultsMusic: BehaviorSubject<any> = new BehaviorSubject(null);
-
+    private _query: BehaviorSubject<string> = new BehaviorSubject("");
 
     get allPreferences$(): Observable<Preference[]> {
         return this._allPreferences.asObservable();
@@ -17,6 +17,10 @@ export class HomeService {
 
     get resultsMusic$(): Observable<any[]> {
       return this._resultsMusic.asObservable();
+    }
+
+    get query$(): Observable<string> {
+      return this._query.asObservable();
     }
 
     getData(): Observable<Preference[]> {
@@ -61,6 +65,9 @@ export class HomeService {
     }
 
     getPreferenceByQuery(query: string | null): Observable<any[]> {
+      if(query) {
+        this._query.next(query);
+      }
       const data: any[] = [
         {
           id: 1,

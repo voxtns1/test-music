@@ -1,6 +1,6 @@
 import { ActivatedRoute, Router } from '@angular/router';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Subject, takeUntil } from 'rxjs';
+import { Observable, Subject, takeUntil } from 'rxjs';
 
 import { HomeService } from './home.service';
 import { Preference } from '@music/core/type';
@@ -12,10 +12,12 @@ import { Preference } from '@music/core/type';
 })
 export class HomeComponent implements OnInit, OnDestroy {
   allPreference$: Preference[];
+  query$: Observable<string>;
   private _unsubscribeAll: Subject<any> = new Subject<any>();
 
   constructor(private _homeService: HomeService, private _router: Router, private _activatedRoute: ActivatedRoute) {
     this.allPreference$ = [];
+    this.query$ = this._homeService.query$;
   }
 
   ngOnInit(): void {
