@@ -15,7 +15,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@music/core/type": ["apps/frontend/src/app/core/type"],
+      "@music/core/type": ["libs/core/type"],
       "@music/frontend/components": ["apps/frontend/src/app/components"]
     }
   },

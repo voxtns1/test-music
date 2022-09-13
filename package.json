@@ -11,6 +11,8 @@
     "ng": "nx",
     "postinstall": "node ./decorate-angular-cli.js && ngcc --properties es2020 browser module main",
     "start": "nx serve",
+    "start:api": "nx run backend:serve",
+    "start:client": "nx run frontend:serve:development",
     "test": "nx test"
   },
   "private": true,
