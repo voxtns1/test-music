@@ -1,18 +1,36 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from "typeorm"
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
-@Entity()
-export class Cover extends BaseEntity{
+import { Music } from './Music';
 
-    @PrimaryGeneratedColumn()
-    id: number
+@Entity('cover', { schema: 'music' })
 
-    @Column()
-    name: string
+export class Cover extends BaseEntity {
+  @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
+  id: number;
 
-    @Column()
-    created: Date
+  @Column('varchar', { name: 'name', length: 255 })
+  name: string;
 
-    @Column()
-    update: Date
+  @Column('timestamp', {
+    name: 'created',
+    nullable: true,
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  created: Date | null;
 
+  @Column('timestamp', {
+    name: 'update',
+    nullable: true,
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  update: Date | null;
+
+  @OneToMany(() => Music, (music) => music.idCover2)
+  music: Music[];
 }
