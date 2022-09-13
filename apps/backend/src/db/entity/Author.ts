@@ -1,18 +1,36 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from "typeorm"
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
-@Entity()
+import { NavMusicAuthor } from './NavMusicAuthor';
+
+@Entity('author', { schema: 'music' })
+
 export class Author extends BaseEntity {
+  @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
+  id: number;
 
-    @PrimaryGeneratedColumn()
-    id: number
+  @Column('varchar', { name: 'name', length: 255 })
+  name: string;
 
-    @Column()
-    name: string
+  @Column('timestamp', {
+    name: 'created',
+    nullable: true,
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  created: Date | null;
 
-    @Column()
-    created: Date
+  @Column('datetime', {
+    name: 'update',
+    nullable: true,
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  update: Date | null;
 
-    @Column()
-    update: Date
-
+  @OneToMany(() => NavMusicAuthor, (navMusicAuthor) => navMusicAuthor.idAuthor2)
+  navMusicAuthors: NavMusicAuthor[];
 }

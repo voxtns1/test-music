@@ -1,21 +1,55 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from "typeorm"
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  Index,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
-@Entity()
-export class NavMusicCategory extends BaseEntity{
+import { Category } from './Category';
+import { Music } from './Music';
 
-    @PrimaryGeneratedColumn()
-    id: number
+@Index('FK_nav_music_category_music', ['idMusic'], {})
+@Index('FK_nav_music_category_category', ['idCategory'], {})
+@Entity('nav_music_category', { schema: 'music' })
 
-    @Column()
-    id_music: number
+export class NavMusicCategory extends BaseEntity {
+  @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
+  id: number;
 
-    @Column()
-    id_category: number
+  @Column('int', { name: 'id_music' })
+  idMusic: number;
 
-    @Column()
-    created: Date
+  @Column('int', { name: 'id_category' })
+  idCategory: number;
 
-    @Column()
-    update: Date
+  @Column('timestamp', {
+    name: 'created',
+    nullable: true,
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  created: Date | null;
 
+  @Column('timestamp', {
+    name: 'update',
+    nullable: true,
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  update: Date | null;
+
+  @ManyToOne(() => Category, (category) => category.navMusicCategories, {
+    onDelete: 'NO ACTION',
+    onUpdate: 'NO ACTION',
+  })
+  @JoinColumn([{ name: 'id_category', referencedColumnName: 'id' }])
+  idCategory2: Category;
+
+  @ManyToOne(() => Music, (music) => music.navMusicCategories, {
+    onDelete: 'NO ACTION',
+    onUpdate: 'NO ACTION',
+  })
+  @JoinColumn([{ name: 'id_music', referencedColumnName: 'id' }])
+  idMusic2: Music;
 }
