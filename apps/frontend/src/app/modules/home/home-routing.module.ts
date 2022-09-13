@@ -4,6 +4,7 @@ import { HomeComponent } from './home.component';
 import { HomeResolver } from './home.resolver';
 import { NgModule } from '@angular/core';
 import { ResultsComponent } from './results/results.component';
+import { ResultsResolver } from './results/results.resolver';
 
 const routes: Routes = [
   {
@@ -16,6 +17,9 @@ const routes: Routes = [
       {
         path: ':query',
         component: ResultsComponent,
+        resolve: {
+          data: ResultsResolver,
+        },
       },
     ],
   },

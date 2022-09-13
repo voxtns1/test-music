@@ -6,8 +6,9 @@
   --padding-sr-rs: 10px;
 
   /* color */
+  --background-color: red;
   --color-search-bar: white;
-  --background-color-search-bar: red;
+  --background-color-search-bar: var(--background-color);
   --background-color-search-button: red;
 }
 

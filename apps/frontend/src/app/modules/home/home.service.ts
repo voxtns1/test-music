@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable, of } from 'rxjs';
+import { BehaviorSubject, Observable, map, of, switchMap, take, throwError } from 'rxjs';
 
 import { Injectable } from '@angular/core';
 import { Preference } from '@music/core/type';
@@ -8,11 +8,15 @@ import { Preference } from '@music/core/type';
 })
 export class HomeService {
     private _allPreferences: BehaviorSubject<Preference[]> = new BehaviorSubject<Preference[]>([]);
-    //private _results: BehaviorSubject<User | null> = new BehaviorSubject(null);
+    private _resultsMusic: BehaviorSubject<any> = new BehaviorSubject(null);
 
 
     get allPreferences$(): Observable<Preference[]> {
         return this._allPreferences.asObservable();
+    }
+
+    get resultsMusic$(): Observable<any[]> {
+      return this._resultsMusic.asObservable();
     }
 
     getData(): Observable<Preference[]> {
@@ -55,4 +59,18 @@ export class HomeService {
       this._allPreferences.next(data);
       return of(data);
     }
+
+    getPreferenceByQuery(query: string | null): Observable<any[]> {
+      const data: any[] = [
+        {
+          id: 1,
+          name: 'Una espada sin igual',
+          category: ['rock', 'andy'],
+          author: 'Los autenticos decadentes',
+          cover: 'https://d1csarkz8obe9u.cloudfront.net/posterpreviews/love-song-mixtape-album-cover-template-design-250a66b33422287542e2690b437f881b_screen.jpg?ts=1635176340'
+        }
+      ];
+      this._resultsMusic.next(data);
+      return of(data);
+  }
 }

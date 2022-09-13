@@ -13,6 +13,7 @@ import { Preference } from '@music/core/type';
 @Injectable({
   providedIn: 'root'
 })
+
 export class HomeResolver implements Resolve<Preference[]> {
   constructor(private _homeService: HomeService) {
 
