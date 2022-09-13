@@ -9,13 +9,13 @@ const routes: Routes = [
   {
     path: '',
     component: HomeComponent,
+    resolve: {
+      data: HomeResolver,
+    },
     children: [
       {
         path: ':query',
         component: ResultsComponent,
-        resolve: {
-          data: HomeResolver,
-        },
       },
     ],
   },

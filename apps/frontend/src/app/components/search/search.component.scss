@@ -12,6 +12,9 @@
         color: var(--color-search-bar);
         font-size: 15px;
         font-weight: 500;
+        margin-top: 6px;
+        display: block;
+
       }
 
       ::ng-deep {
@@ -26,6 +29,14 @@
         .mat-form-field-ripple {
           width: calc(100% - var(--width-sr));
           margin-left: var(--width-sr);
+        }
+
+        .mat-chip-list-wrapper{
+          min-height: 40px;
+
+          .mat-chip{
+            min-height: 25px;
+          }
         }
       }
     }
