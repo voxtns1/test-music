@@ -13,7 +13,9 @@
     "start": "nx serve",
     "start:api": "nx run backend:serve",
     "start:client": "nx run frontend:serve:development",
-    "test": "nx test"
+    "test": "nx test",
+    "typeorm-sync": "typeorm-codebase-sync addReferences --dataSource ./apps/backend/src/db/data-source.ts --migrations ./apps/backend/src/db/migrations --entities ./apps/backend/src/db/entities --subscribers ./apps/backend/src/db/subscribers",
+    "posttypeorm": "npm run typeorm-sync"
   },
   "private": true,
   "dependencies": {
@@ -30,13 +32,17 @@
     "@nestjs/common": "^9.0.0",
     "@nestjs/core": "^9.0.0",
     "@nestjs/platform-express": "^9.0.0",
+    "@nestjs/typeorm": "^9.0.1",
     "@ngx-translate/core": "^14.0.0",
     "@ngx-translate/http-loader": "^7.0.0",
     "@nrwl/angular": "^14.6.5",
     "@nrwl/nest": "^14.6.5",
+    "mysql": "^2.18.1",
+    "mysql2": "^2.3.3",
     "reflect-metadata": "^0.1.13",
     "rxjs": "~7.5.0",
     "tslib": "^2.3.0",
+    "typeorm": "^0.3.9",
     "zone.js": "~0.11.4"
   },
   "devDependencies": {
@@ -78,6 +84,7 @@
     "prettier": "^2.6.2",
     "ts-jest": "28.0.5",
     "ts-node": "10.9.1",
+    "typeorm-codebase-sync": "^1.1.2",
     "typescript": "~4.7.2"
   },
   "config": {

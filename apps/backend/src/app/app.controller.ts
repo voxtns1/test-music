@@ -12,7 +12,7 @@ export class AppController {
   }
 
   @Get(':query')
-  results(@Param('query') query: string) {
+  getQuery(@Param('query') query: string) {
     return this.appService.getQuery(query);
   }
 }

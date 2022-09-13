@@ -36,7 +36,7 @@ export class HomeService {
     getPreferenceByQuery(query: string | null): Observable<ResultMusic[]> {
       if(!query) return of([]);
 
-      return this.http.get<ResultMusic[]>(`${environment.endPoint}/data/results`, { params: { query }}).pipe(tap(res => {
+      return this.http.get<ResultMusic[]>(`${environment.endPoint}/data/${query}`).pipe(tap(res => {
         this._query.next(query);
         this._resultsMusic.next(res)
       }));
