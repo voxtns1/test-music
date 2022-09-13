@@ -1,25 +1,91 @@
-import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm"
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  Index,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
+import { Author } from './Author';
+import { Category } from './Category';
 import { Cover } from './Cover';
+import { NavMusicAuthor } from './NavMusicAuthor';
+import { NavMusicCategory } from './NavMusicCategory';
 
-@Entity()
+@Index('FK_music_cover', ['idCover'], {})
+@Entity('music', { schema: 'music' })
 export class Music extends BaseEntity {
-    @ManyToOne(() => Cover)
-    @JoinColumn({ name: 'id_cover' })
-    private _cover: never;
+  @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
+  id: number;
 
-    @PrimaryGeneratedColumn()
-    id: number
+  @Column('int', { name: 'id_cover' })
+  idCover: number;
 
-    @Column()
-    id_cover: number
+  @Column('varchar', { name: 'name', length: 255 })
+  name: string;
 
-    @Column()
-    name: string
+  @Column('timestamp', {
+    name: 'created',
+    nullable: true,
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  created: Date | null;
 
-    @Column()
-    created: Date
+  @Column('timestamp', {
+    name: 'update',
+    nullable: true,
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  update: Date | null;
 
-    @Column()
-    update: Date
+  @ManyToOne(() => Cover, (cover) => cover.music, {
+    onDelete: 'NO ACTION',
+    onUpdate: 'NO ACTION',
+  })
+  @JoinColumn([{ name: 'id_cover', referencedColumnName: 'id' }])
+  idCover2: Cover;
+
+  @OneToMany(() => NavMusicAuthor, (navMusicAuthor) => navMusicAuthor.idMusic2)
+  navMusicAuthors: NavMusicAuthor[];
+
+  @OneToMany(() => NavMusicCategory, (navMusicCategory) => navMusicCategory.idMusic2)
+  navMusicCategories: NavMusicCategory[];
+
+  static async findByTest(author: number[], category: number[]) {
+    const authorQuery = reduceWhereQuery('author2.id', author);
+    const categoryQuery = reduceWhereQuery('category2.id', category);
+    let whereQuery = authorQuery || categoryQuery || '';
+    if(authorQuery && categoryQuery) {
+      whereQuery = `${authorQuery} and ${categoryQuery}`;
+    }
+
+    const query = this.createQueryBuilder('music')
+      .select(['music.id as id', 'music.name as name', 'GROUP_CONCAT(DISTINCT author2.name, " ") as author', 'cover2.name as cover', 'GROUP_CONCAT(DISTINCT `category2`.`name`, " ") as category'])
+      .innerJoin(NavMusicAuthor, 'navMusicAuthor', 'navMusicAuthor.id_music = music.id')
+      .innerJoin(NavMusicCategory, 'navMusicCategory', 'navMusicCategory.id_music = music.id')
+      .innerJoin(Author, 'author2', 'navMusicAuthor.id_author = author2.id')
+      .innerJoin(Category, 'category2', 'category2.id = navMusicCategory.id_category')
+      .innerJoin(Cover, 'cover2', 'music.id_cover = cover2.id')
+      .where(whereQuery)
+      .groupBy('music.id')
+      .limit(5);
+
+
+    console.log(query.getSql());
+
+    const req = await query.getRawMany();
+    return req.map(val => ({ ...val, category: val.category.split(',') }));
+  }
+}
+
+function reduceWhereQuery(cond: string, ids: number[]) {
+  if(ids.length <= 0) return;
+  const reduce = ids.reduce((preview, id) => {
+    preview += `and ${cond}=${id} `;
+    return preview;
+  }, "");
+  return reduce.slice(3);
 }

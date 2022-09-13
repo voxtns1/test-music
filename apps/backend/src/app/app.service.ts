@@ -1,4 +1,4 @@
-import { Author, Category, Cover, Music, NavMusicAuthor, NavMusicCategory } from '@music/backend/entity';
+import { Author, Category, Music } from '@music/backend/entity';
 import { Preference, PreferenceQuery, ResultMusic } from '@music/core/type';
 
 import { Injectable } from '@nestjs/common';
@@ -23,39 +23,9 @@ export class AppService {
 
   async getQuery(query: string): Promise<ResultMusic[]> {
     const preferenceUser = this.transformPreference(query);
-    const musicAll = await Music.find();
-    const coverAll = await Cover.find();
-    const authorAll = await Author.find();
-
-    const results = {};
-
-    const musics = musicAll.map((music) => {
-      return {
-        id: music.id,
-        name: music.name,
-        category: [],
-        author: '',
-        cover: coverAll.find((aut) => aut.id === music.id_cover).name
-      };
-    });
-
-    if(preferenceUser?.['author']) {
-      const author = preferenceUser['author'];
-      const navMusicAuthor = await NavMusicAuthor.find();
-      navMusicAuthor.filter(nav => author.children.includes(nav.id_author)).forEach(val => {
-        results[val.id_music] = val;
-      });
-    }
-
-    if(preferenceUser?.['category']) {
-      const category = preferenceUser['category'];
-      const navMusicCategory = await NavMusicCategory.find();
-      navMusicCategory.filter(nav => category.children.includes(nav.id_category)).forEach(val => {
-        results[val.id_music] = val;
-      });
-    }
-
-    return [musics[0]];
+    const author = preferenceUser['author']?.children || [];
+    const category = preferenceUser['category']?.children || [];
+    return Music.findByTest(author, category);
   }
 
   private transformPreference(query: string) {

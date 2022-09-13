@@ -1,18 +1,38 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from "typeorm"
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
-@Entity()
-export class Category extends BaseEntity{
+import { NavMusicCategory } from './NavMusicCategory';
 
-    @PrimaryGeneratedColumn()
-    id: number
+@Entity('category', { schema: 'music' })
+export class Category extends BaseEntity {
+  @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
+  id: number;
 
-    @Column()
-    name: string
+  @Column('varchar', { name: 'name', length: 255 })
+  name: string;
 
-    @Column()
-    created: Date
+  @Column('timestamp', {
+    name: 'created',
+    nullable: true,
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  created: Date | null;
 
-    @Column()
-    update: Date
+  @Column('timestamp', {
+    name: 'update',
+    nullable: true,
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  update: Date | null;
 
+  @OneToMany(
+    () => NavMusicCategory,
+    (navMusicCategory) => navMusicCategory.idCategory2
+  )
+  navMusicCategories: NavMusicCategory[];
 }

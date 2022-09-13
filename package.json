@@ -14,6 +14,7 @@
     "start:api": "nx run backend:serve",
     "start:client": "nx run frontend:serve:development",
     "test": "nx test",
+    "typeorm-model-generator": "npx typeorm-model-generator",
     "typeorm-sync": "typeorm-codebase-sync addReferences --dataSource ./apps/backend/src/db/data-source.ts --migrations ./apps/backend/src/db/migrations --entities ./apps/backend/src/db/entities --subscribers ./apps/backend/src/db/subscribers",
     "posttypeorm": "npm run typeorm-sync"
   },
