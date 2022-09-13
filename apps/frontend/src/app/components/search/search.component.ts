@@ -86,7 +86,9 @@ export class SearchComponent implements OnInit{
   }
 
   submit() {
-    this.resultsPreference.emit(Object.values(this.preferencesUser));
+    const preferencesUser = Object.values(this.preferencesUser);
+    if(preferencesUser.length === 0) return;
+    this.resultsPreference.emit(preferencesUser);
   }
 
   heightChipList(elem: HTMLInputElement) {

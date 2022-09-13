@@ -24,7 +24,7 @@
   </mat-form-field>
 
   <div class="container-action-search">
-    <button mat-button [style.height]="afterViewInit ? heightChipList(preferenceInput) : 0" (click)="submit()">
+    <button mat-button  [class.opacity]="tags.length === 0" [style.height]="afterViewInit ? heightChipList(preferenceInput) : 0" (click)="submit()" [disabled]="tags.length === 0">
       <mat-icon>search</mat-icon>
     </button>
   </div>

@@ -54,6 +54,11 @@
       background-color: var(--background-color-search-button);
       color: var(--color-search-bar);
       border-left: 1px solid var(--color-search-bar);
+      transition: opacity 0.25s ease-in;
+
+      &.opacity {
+        opacity: 0.7;
+      }
     }
   }
 }

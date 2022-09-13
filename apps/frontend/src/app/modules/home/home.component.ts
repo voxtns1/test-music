@@ -1,3 +1,4 @@
+import { ActivatedRoute, Router } from '@angular/router';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 
@@ -13,7 +14,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   allPreference$: Preference[];
   private _unsubscribeAll: Subject<any> = new Subject<any>();
 
-  constructor(private _homeService: HomeService) {
+  constructor(private _homeService: HomeService, private _router: Router, private _activatedRoute: ActivatedRoute) {
     this.allPreference$ = [];
   }
 
@@ -25,13 +26,21 @@ export class HomeComponent implements OnInit, OnDestroy {
     });
   }
 
-
   ngOnDestroy(): void {
     this._unsubscribeAll.next(null);
     this._unsubscribeAll.complete();
   }
 
-  resultsPreference($event: Preference[]) {
-    console.log($event);
+  resultsPreference($preference: Preference[]) {
+    const query = this._queryReduce($preference);
+    this._router.navigate(['./', query], { relativeTo: this._activatedRoute });
+  }
+
+  private _queryReduce(preference: Preference[]) {
+    return preference.reduce((preview, value) => {
+      const list = value.children.map(({id}) => id).join(",");
+      preview += `&${value.category}:${list}`;
+      return preview;
+    }, "").slice(1);
   }
 }
