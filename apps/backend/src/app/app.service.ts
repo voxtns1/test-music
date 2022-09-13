@@ -1,4 +1,4 @@
-import { Author, Category } from '@music/backend/entity';
+import { Author, Category, Cover, Music, NavMusicAuthor, NavMusicCategory } from '@music/backend/entity';
 import { Preference, PreferenceQuery, ResultMusic } from '@music/core/type';
 
 import { Injectable } from '@nestjs/common';
@@ -15,34 +15,58 @@ export class AppService {
         children: authorAll.map(({id, name}) => ({ id, name })),
       },
       {
-        category: 'generic',
+        category: 'category',
         children: categoryAll.map(({id, name}) => ({ id, name })),
       }
     ];
   }
 
-  getQuery(query: string): ResultMusic[] {
-    console.log("sahdiuhasdu ---> ", this.transformPreference(query))
-    return [
-      {
-        id: 1,
-        name: 'Una espada sin igual',
-        category: ['rock', 'andy'],
-        author: 'Los autenticos decadentes',
-        cover: 'https://d1csarkz8obe9u.cloudfront.net/posterpreviews/love-song-mixtape-album-cover-template-design-250a66b33422287542e2690b437f881b_screen.jpg?ts=1635176340'
-      }
-    ];
+  async getQuery(query: string): Promise<ResultMusic[]> {
+    const preferenceUser = this.transformPreference(query);
+    const musicAll = await Music.find();
+    const coverAll = await Cover.find();
+    const authorAll = await Author.find();
+
+    const results = {};
+
+    const musics = musicAll.map((music) => {
+      return {
+        id: music.id,
+        name: music.name,
+        category: [],
+        author: '',
+        cover: coverAll.find((aut) => aut.id === music.id_cover).name
+      };
+    });
+
+    if(preferenceUser?.['author']) {
+      const author = preferenceUser['author'];
+      const navMusicAuthor = await NavMusicAuthor.find();
+      navMusicAuthor.filter(nav => author.children.includes(nav.id_author)).forEach(val => {
+        results[val.id_music] = val;
+      });
+    }
+
+    if(preferenceUser?.['category']) {
+      const category = preferenceUser['category'];
+      const navMusicCategory = await NavMusicCategory.find();
+      navMusicCategory.filter(nav => category.children.includes(nav.id_category)).forEach(val => {
+        results[val.id_music] = val;
+      });
+    }
+
+    return [musics[0]];
   }
 
   private transformPreference(query: string) {
     const preferences = query.split('&');
-    return preferences.reduce<PreferenceQuery[]>((preview, values) => {
+    return preferences.reduce<Record<string, PreferenceQuery>>((preview, values) => {
       const [category, stringList] = values.split(":");
       const children = stringList.split(',').map(Number);
       if(children) {
-        preview.push({ category, children });
+        preview[category] = { category, children };
       }
       return preview;
-    }, []);
+    }, {});
   }
 }

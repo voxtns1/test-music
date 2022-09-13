@@ -1,7 +1,12 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from "typeorm"
+import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm"
+
+import { Cover } from './Cover';
 
 @Entity()
-export class Music extends BaseEntity{
+export class Music extends BaseEntity {
+    @ManyToOne(() => Cover)
+    @JoinColumn({ name: 'id_cover' })
+    private _cover: never;
 
     @PrimaryGeneratedColumn()
     id: number
@@ -17,5 +22,4 @@ export class Music extends BaseEntity{
 
     @Column()
     update: Date
-
 }
