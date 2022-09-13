@@ -54,7 +54,7 @@ export class Music extends BaseEntity {
   @OneToMany(() => NavMusicCategory, (navMusicCategory) => navMusicCategory.idMusic2)
   navMusicCategories: NavMusicCategory[];
 
-  static async findByTest(author: number[], category: number[]) {
+  static async findByPreferenceMusic(author: number[], category: number[]) {
     const authorQuery = reduceWhereQuery('author2.id', author);
     const categoryQuery = reduceWhereQuery('category2.id', category);
     let whereQuery = authorQuery || categoryQuery || '';
@@ -63,18 +63,24 @@ export class Music extends BaseEntity {
     }
 
     const query = this.createQueryBuilder('music')
-      .select(['music.id as id', 'music.name as name', 'GROUP_CONCAT(DISTINCT author2.name, " ") as author', 'cover2.name as cover', 'GROUP_CONCAT(DISTINCT `category2`.`name`, " ") as category'])
+      .select([
+        'music.id as id',
+        'music.name as name',
+        'cover2.name as cover',
+        'GROUP_CONCAT(DISTINCT author2.name, " ") as author',
+        'GROUP_CONCAT(DISTINCT `category2`.`name`, " ") as category',
+        'SUM(DISTINCT category2.id) AS SUMcategory2',
+        'SUM(DISTINCT author2.id) AS SUMauthor2'
+      ])
       .innerJoin(NavMusicAuthor, 'navMusicAuthor', 'navMusicAuthor.id_music = music.id')
       .innerJoin(NavMusicCategory, 'navMusicCategory', 'navMusicCategory.id_music = music.id')
       .innerJoin(Author, 'author2', 'navMusicAuthor.id_author = author2.id')
       .innerJoin(Category, 'category2', 'category2.id = navMusicCategory.id_category')
       .innerJoin(Cover, 'cover2', 'music.id_cover = cover2.id')
       .where(whereQuery)
+      .orderBy('SUMcategory2', 'DESC')
       .groupBy('music.id')
       .limit(5);
-
-
-    console.log(query.getSql());
 
     const req = await query.getRawMany();
     return req.map(val => ({ ...val, category: val.category.split(',') }));
@@ -84,7 +90,7 @@ export class Music extends BaseEntity {
 function reduceWhereQuery(cond: string, ids: number[]) {
   if(ids.length <= 0) return;
   const reduce = ids.reduce((preview, id) => {
-    preview += `and ${cond}=${id} `;
+    preview += `or ${cond}=${id} `;
     return preview;
   }, "");
   return reduce.slice(3);

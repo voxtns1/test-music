@@ -25,7 +25,7 @@ export class AppService {
     const preferenceUser = this.transformPreference(query);
     const author = preferenceUser['author']?.children || [];
     const category = preferenceUser['category']?.children || [];
-    return Music.findByTest(author, category);
+    return Music.findByPreferenceMusic(author, category);
   }
 
   private transformPreference(query: string) {
