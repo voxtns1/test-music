@@ -1,0 +1,15 @@
+<div class="container-result" *ngIf="resultMusic">
+  <div class="container-result-image">
+    <div class="container-result-cover" [style.backgroundImage]="'url('+resultMusic.cover+')'"></div>
+  </div>
+  <div class="container-result-description">
+    <div class="container-result-title">
+      <h2>{{ resultMusic.name }}</h2>
+      <div class="divide"></div>
+      <p>{{ resultMusic.author }}</p>
+    </div>
+    <div class="container-result-tags">
+      <mat-chip *ngFor="let tag of resultMusic.category">{{ tag }}</mat-chip>
+    </div>
+  </div>
+</div>
