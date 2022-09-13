@@ -15,3 +15,8 @@ export interface ResultMusic {
   author: string;
   cover: string;
 }
+
+export interface PreferenceQuery {
+  category: string;
+  children: number[];
+}

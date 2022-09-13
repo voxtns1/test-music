@@ -15,7 +15,7 @@
 
     <mat-autocomplete class="search-autocomplete" #auto="matAutocomplete">
       <ng-container *ngFor="let preferences of filteredPreferences | async">
-        {{ preferences.category }}
+        {{ 'component.music-search.'+preferences.category | translate }}
         <mat-option *ngFor="let list of preferences.children" [value]="list" (click)="selected(list, preferences.category)">
           {{ list.name }}
         </mat-option>
