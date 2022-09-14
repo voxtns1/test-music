@@ -7,6 +7,7 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  SelectQueryBuilder,
 } from 'typeorm';
 
 import { Author } from './Author';
@@ -14,6 +15,13 @@ import { Category } from './Category';
 import { Cover } from './Cover';
 import { NavMusicAuthor } from './NavMusicAuthor';
 import { NavMusicCategory } from './NavMusicCategory';
+
+interface ValuesElement {
+  ids: number[];
+  tagIdQuery: string;
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  navTable: Function;
+}
 
 @Index('FK_music_cover', ['idCover'], {})
 @Entity('music', { schema: 'music' })
@@ -58,6 +66,19 @@ export class Music extends BaseEntity {
   navMusicCategories: NavMusicCategory[];
 
   static async findByPreferenceMusic(author: number[], category: number[]) {
+    const whereElement = [
+      {
+        tagIdQuery: 'id_author',
+        navTable: NavMusicAuthor,
+        ids: author,
+      },
+      {
+        tagIdQuery: 'id_category',
+        navTable: NavMusicCategory,
+        ids: category,
+      },
+    ];
+
     const query = this.createQueryBuilder('music')
       .select([
         'music.id as id',
@@ -83,28 +104,14 @@ export class Music extends BaseEntity {
         'category2.id = navMusicCategory.id_category'
       )
       .innerJoin(Cover, 'cover2', 'music.id_cover = cover2.id')
-      .where((qb) => {
-        const whereCategorys = subQueryWhere(
-          'id_category',
-          category,
-          NavMusicCategory,
-          qb
-        );
-
-        const whereAuthors = subQueryWhere(
-          'id_author',
-          author,
-          NavMusicAuthor,
-          qb
-        );
-
-        const whereSubQuery =
-          whereCategorys && whereAuthors
-            ? `${whereCategorys} AND ${whereAuthors}`
-            : whereCategorys || whereAuthors;
-
-        return whereSubQuery;
-      })
+      .where((qb) =>
+        whereElement
+          .reduce((preview, values) => {
+            preview += subQueryWhere(qb, values);
+            return preview;
+          }, '')
+          .slice(3)
+      )
       .groupBy('music.id')
       .limit(5);
 
@@ -113,17 +120,21 @@ export class Music extends BaseEntity {
   }
 }
 
-function subQueryWhere(idCond: string, ids: number[], navTable, qb) {
-  if (ids.length <= 0) return;
+function subQueryWhere<T>(
+  qb: SelectQueryBuilder<T>,
+  values: ValuesElement
+): string {
+  const { ids, tagIdQuery, navTable } = values;
+  if (ids.length <= 0) return '';
   const [id, ..._ids] = ids;
-  let whereSubQuery = `a.${idCond} = ${id} `;
+  let whereSubQuery = `a.${tagIdQuery} = ${id} `;
   const subQuery = qb.subQuery().select('a.id_music').from(navTable, 'a');
 
   _ids.forEach((id, inx) => {
-    whereSubQuery += `AND a${inx}.${idCond} = ${id}`;
+    whereSubQuery += `AND a${inx}.${tagIdQuery} = ${id}`;
     subQuery.innerJoin(navTable, `a${inx}`, `a.id_music = a${inx}.id_music`);
   });
   subQuery.where(whereSubQuery);
 
-  return `music.id IN ${subQuery.getQuery()}`;
+  return `AND music.id IN ${subQuery.getQuery()}`;
 }
