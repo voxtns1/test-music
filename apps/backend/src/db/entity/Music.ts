@@ -51,17 +51,13 @@ export class Music extends BaseEntity {
   @OneToMany(() => NavMusicAuthor, (navMusicAuthor) => navMusicAuthor.idMusic2)
   navMusicAuthors: NavMusicAuthor[];
 
-  @OneToMany(() => NavMusicCategory, (navMusicCategory) => navMusicCategory.idMusic2)
+  @OneToMany(
+    () => NavMusicCategory,
+    (navMusicCategory) => navMusicCategory.idMusic2
+  )
   navMusicCategories: NavMusicCategory[];
 
   static async findByPreferenceMusic(author: number[], category: number[]) {
-    const authorQuery = reduceWhereQuery('author2.id', author);
-    const categoryQuery = reduceWhereQuery('category2.id', category);
-    let whereQuery = authorQuery || categoryQuery || '';
-    if(authorQuery && categoryQuery) {
-      whereQuery = `${authorQuery} and ${categoryQuery}`;
-    }
-
     const query = this.createQueryBuilder('music')
       .select([
         'music.id as id',
@@ -69,29 +65,65 @@ export class Music extends BaseEntity {
         'cover2.name as cover',
         'GROUP_CONCAT(DISTINCT author2.name, " ") as author',
         'GROUP_CONCAT(DISTINCT `category2`.`name`, " ") as category',
-        'SUM(DISTINCT category2.id) AS SUMcategory2',
-        'SUM(DISTINCT author2.id) AS SUMauthor2'
       ])
-      .innerJoin(NavMusicAuthor, 'navMusicAuthor', 'navMusicAuthor.id_music = music.id')
-      .innerJoin(NavMusicCategory, 'navMusicCategory', 'navMusicCategory.id_music = music.id')
+      .innerJoin(
+        NavMusicAuthor,
+        'navMusicAuthor',
+        'navMusicAuthor.id_music = music.id'
+      )
+      .innerJoin(
+        NavMusicCategory,
+        'navMusicCategory',
+        'navMusicCategory.id_music = music.id'
+      )
       .innerJoin(Author, 'author2', 'navMusicAuthor.id_author = author2.id')
-      .innerJoin(Category, 'category2', 'category2.id = navMusicCategory.id_category')
+      .innerJoin(
+        Category,
+        'category2',
+        'category2.id = navMusicCategory.id_category'
+      )
       .innerJoin(Cover, 'cover2', 'music.id_cover = cover2.id')
-      .where(whereQuery)
-      .orderBy('SUMcategory2', 'DESC')
+      .where((qb) => {
+        const whereCategorys = subQueryWhere(
+          'id_category',
+          category,
+          NavMusicCategory,
+          qb
+        );
+
+        const whereAuthors = subQueryWhere(
+          'id_author',
+          author,
+          NavMusicAuthor,
+          qb
+        );
+
+        const whereSubQuery =
+          whereCategorys && whereAuthors
+            ? `${whereCategorys} AND ${whereAuthors}`
+            : whereCategorys || whereAuthors;
+
+        return whereSubQuery;
+      })
       .groupBy('music.id')
       .limit(5);
 
     const req = await query.getRawMany();
-    return req.map(val => ({ ...val, category: val.category.split(',') }));
+    return req.map((val) => ({ ...val, category: val.category.split(',') }));
   }
 }
 
-function reduceWhereQuery(cond: string, ids: number[]) {
-  if(ids.length <= 0) return;
-  const reduce = ids.reduce((preview, id) => {
-    preview += `or ${cond}=${id} `;
-    return preview;
-  }, "");
-  return reduce.slice(3);
+function subQueryWhere(idCond: string, ids: number[], navTable, qb) {
+  if (ids.length <= 0) return;
+  const [id, ..._ids] = ids;
+  let whereSubQuery = `a.${idCond} = ${id} `;
+  const subQuery = qb.subQuery().select('a.id_music').from(navTable, 'a');
+
+  _ids.forEach((id, inx) => {
+    whereSubQuery += `AND a${inx}.${idCond} = ${id}`;
+    subQuery.innerJoin(navTable, `a${inx}`, `a.id_music = a${inx}.id_music`);
+  });
+  subQuery.where(whereSubQuery);
+
+  return `music.id IN ${subQuery.getQuery()}`;
 }
