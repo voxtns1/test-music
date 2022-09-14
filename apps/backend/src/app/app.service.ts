@@ -29,14 +29,18 @@ export class AppService {
   }
 
   private transformPreference(query: string) {
-    const preferences = query.split('&');
-    return preferences.reduce<Record<string, PreferenceQuery>>((preview, values) => {
-      const [category, stringList] = values.split(":");
-      const children = stringList.split(',').map(Number);
-      if(children) {
-        preview[category] = { category, children };
-      }
-      return preview;
-    }, {});
+    try {
+      const preferences = query.split('&');
+      return preferences.reduce<Record<string, PreferenceQuery>>((preview, values) => {
+        const [category, stringList] = values.split(":");
+        const children = stringList.split(',').map(Number);
+        if(children) {
+          preview[category] = { category, children };
+        }
+        return preview;
+      }, {});
+    }catch(e) {
+      return {};
+    }
   }
 }

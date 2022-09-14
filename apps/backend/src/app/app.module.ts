@@ -1,8 +1,9 @@
 import * as Entity from '@music/backend/entity';
 
+import { CacheModule, Module } from '@nestjs/common';
+
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { environment } from '../environments/environment';
 
@@ -12,7 +13,14 @@ const configure = {
 };
 
 @Module({
-  imports: [TypeOrmModule.forRoot({type: 'mysql', ...environment.database, ...configure})],
+  imports: [
+    CacheModule.register(),
+    TypeOrmModule.forRoot({
+      type: 'mysql',
+      ...environment.database,
+      ...configure,
+    }),
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
